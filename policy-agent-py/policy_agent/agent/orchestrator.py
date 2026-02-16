@@ -131,7 +131,7 @@ class Orchestrator:
             )
 
         # Use AI to fix
-        return self.ai_client.remediate(content, result.violations)
+        return self.ai_client.remediate(result.domain, content, result.violations)
 
     def get_available_domains(self) -> List[str]:
         """Get list of available validation domains.
