@@ -1,0 +1,115 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: policy-agent-webhook
+  namespace: policy-agent
+  labels:
+    app: policy-agent-webhook
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: policy-agent-webhook
+  template:
+    metadata:
+      labels:
+        app: policy-agent-webhook
+    spec:
+      serviceAccountName: policy-agent-webhook
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        fsGroup: 65534
+
+      containers:
+        - name: webhook
+          image: policy-agent/webhook-server:latest
+          imagePullPolicy: IfNotPresent
+
+          ports:
+            - name: webhook
+              containerPort: 8443
+              protocol: TCP
+
+          env:
+            - name: ANTHROPIC_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: policy-agent-secrets
+                  key: anthropic-api-key
+
+          args:
+            - --port=8443
+            - --tls-cert=/etc/certs/tls.crt
+            - --tls-key=/etc/certs/tls.key
+            - --config=/etc/policy-agent/config.yaml
+
+          volumeMounts:
+            - name: certs
+              mountPath: /etc/certs
+              readOnly: true
+            - name: config
+              mountPath: /etc/policy-agent
+              readOnly: true
+            - name: policies
+              mountPath: /etc/policies
+              readOnly: true
+
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8443
+              scheme: HTTPS
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: 8443
+              scheme: HTTPS
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+
+      volumes:
+        - name: certs
+          secret:
+            secretName: policy-agent-webhook-certs
+        - name: config
+          configMap:
+            name: policy-agent-config
+        - name: policies
+          configMap:
+            name: policy-agent-policies
+
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - policy-agent-webhook
+                topologyKey: kubernetes.io/hostname

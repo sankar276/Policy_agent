@@ -1,0 +1,36 @@
+# If using cert-manager for TLS certificate management
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: policy-agent-webhook-cert
+  namespace: policy-agent
+spec:
+  secretName: policy-agent-webhook-certs
+  duration: 8760h # 1 year
+  renewBefore: 720h # 30 days
+
+  subject:
+    organizations:
+      - policy-agent
+
+  commonName: policy-agent-webhook.policy-agent.svc
+
+  dnsNames:
+    - policy-agent-webhook
+    - policy-agent-webhook.policy-agent
+    - policy-agent-webhook.policy-agent.svc
+    - policy-agent-webhook.policy-agent.svc.cluster.local
+
+  issuerRef:
+    name: policy-agent-ca-issuer
+    kind: Issuer
+
+---
+# Self-signed CA issuer for webhook certificates
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: policy-agent-ca-issuer
+  namespace: policy-agent
+spec:
+  selfSigned: {}

@@ -1,0 +1,46 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: policy-agent-webhook
+  namespace: policy-agent
+  labels:
+    app: policy-agent-webhook
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: policy-agent-webhook
+  labels:
+    app: policy-agent-webhook
+rules:
+  # Read policies and configurations
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get", "list", "watch"]
+
+  # Read secrets (for API keys)
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get"]
+
+  # Validate resources
+  - apiGroups: ["*"]
+    resources: ["*"]
+    verbs: ["get"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: policy-agent-webhook
+  labels:
+    app: policy-agent-webhook
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: policy-agent-webhook
+subjects:
+  - kind: ServiceAccount
+    name: policy-agent-webhook
+    namespace: policy-agent

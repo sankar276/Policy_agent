@@ -1,0 +1,83 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  name: policy-agent-webhook
+  labels:
+    app: policy-agent-webhook
+webhooks:
+  - name: validate.policy-agent.io
+    clientConfig:
+      service:
+        name: policy-agent-webhook
+        namespace: policy-agent
+        path: "/validate"
+      caBundle: ${CA_BUNDLE}  # Will be injected by cert-manager or setup script
+
+    rules:
+      # Kafka resources (Strimzi)
+      - operations: ["CREATE", "UPDATE"]
+        apiGroups: ["kafka.strimzi.io"]
+        apiVersions: ["*"]
+        resources: ["kafkatopics", "kafkausers", "kafkaconnects", "kafkaconnectors"]
+        scope: "*"
+
+      # Kubernetes core resources
+      - operations: ["CREATE", "UPDATE"]
+        apiGroups: ["apps"]
+        apiVersions: ["v1"]
+        resources: ["deployments", "statefulsets", "daemonsets"]
+        scope: "*"
+
+      - operations: ["CREATE", "UPDATE"]
+        apiGroups: [""]
+        apiVersions: ["v1"]
+        resources: ["pods", "services", "configmaps"]
+        scope: "*"
+
+      # Flux CD resources
+      - operations: ["CREATE", "UPDATE"]
+        apiGroups: ["kustomize.toolkit.fluxcd.io"]
+        apiVersions: ["*"]
+        resources: ["kustomizations"]
+        scope: "*"
+
+      - operations: ["CREATE", "UPDATE"]
+        apiGroups: ["source.toolkit.fluxcd.io"]
+        apiVersions: ["*"]
+        resources: ["gitrepositories", "helmrepositories", "buckets"]
+        scope: "*"
+
+      - operations: ["CREATE", "UPDATE"]
+        apiGroups: ["helm.toolkit.fluxcd.io"]
+        apiVersions: ["*"]
+        resources: ["helmreleases"]
+        scope: "*"
+
+      # ArgoCD resources
+      - operations: ["CREATE", "UPDATE"]
+        apiGroups: ["argoproj.io"]
+        apiVersions: ["*"]
+        resources: ["applications", "appprojects"]
+        scope: "*"
+
+    admissionReviewVersions: ["v1", "v1beta1"]
+    sideEffects: None
+    timeoutSeconds: 10
+
+    failurePolicy: Fail  # Fail closed for security
+    matchPolicy: Equivalent
+
+    namespaceSelector:
+      matchExpressions:
+        - key: policy-agent/validation
+          operator: NotIn
+          values: ["skip"]
+        - key: kubernetes.io/metadata.name
+          operator: NotIn
+          values: ["kube-system", "kube-public", "policy-agent"]
+
+    objectSelector:
+      matchExpressions:
+        - key: policy-agent/validation
+          operator: NotIn
+          values: ["skip"]
