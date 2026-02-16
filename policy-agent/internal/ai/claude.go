@@ -10,7 +10,7 @@ import (
 
 	"github.com/anthropics/anthropic-sdk-go"
 	"github.com/anthropics/anthropic-sdk-go/option"
-	"github.com/policy-agent/policy-agent/pkg/types"
+	"policy-agent/pkg/types"
 )
 
 // ClaudeClient implements the Client interface using Anthropic's Claude API

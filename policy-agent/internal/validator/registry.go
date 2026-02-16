@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/policy-agent/policy-agent/pkg/errors"
+	"policy-agent/pkg/errors"
 )
 
 // DefaultRegistry is the default validator registry

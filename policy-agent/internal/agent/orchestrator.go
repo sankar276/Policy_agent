@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/policy-agent/policy-agent/internal/ai"
-	"github.com/policy-agent/policy-agent/internal/policy"
-	"github.com/policy-agent/policy-agent/internal/validator"
-	"github.com/policy-agent/policy-agent/pkg/errors"
-	"github.com/policy-agent/policy-agent/pkg/types"
+	"policy-agent/internal/ai"
+	"policy-agent/internal/policy"
+	"policy-agent/internal/validator"
+	"policy-agent/pkg/errors"
+	"policy-agent/pkg/types"
 )
 
 // Orchestrator coordinates validation across multiple domains

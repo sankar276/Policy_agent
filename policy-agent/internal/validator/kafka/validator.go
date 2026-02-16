@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/policy-agent/policy-agent/internal/policy"
-	"github.com/policy-agent/policy-agent/internal/validator"
-	"github.com/policy-agent/policy-agent/pkg/errors"
-	"github.com/policy-agent/policy-agent/pkg/types"
+	"policy-agent/internal/policy"
+	"policy-agent/internal/validator"
+	"policy-agent/pkg/errors"
+	"policy-agent/pkg/types"
 	"gopkg.in/yaml.v3"
 )
 

@@ -3,7 +3,7 @@ package ai
 import (
 	"context"
 
-	"github.com/policy-agent/policy-agent/pkg/types"
+	"policy-agent/pkg/types"
 )
 
 // Client defines the interface for AI interactions

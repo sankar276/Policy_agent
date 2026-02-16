@@ -9,7 +9,7 @@ import (
 
 	"github.com/open-policy-agent/opa/ast"
 	"github.com/open-policy-agent/opa/rego"
-	"github.com/policy-agent/policy-agent/pkg/errors"
+	"policy-agent/pkg/errors"
 )
 
 // Engine manages OPA policy evaluation

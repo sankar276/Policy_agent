@@ -3,7 +3,7 @@ package validator
 import (
 	"context"
 
-	"github.com/policy-agent/policy-agent/pkg/types"
+	"policy-agent/pkg/types"
 )
 
 // Validator defines the interface that all domain validators must implement

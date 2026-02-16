@@ -6,13 +6,13 @@ import (
 	"os"
 	"time"
 
-	"github.com/policy-agent/policy-agent/internal/agent"
-	"github.com/policy-agent/policy-agent/internal/ai"
-	"github.com/policy-agent/policy-agent/internal/config"
-	"github.com/policy-agent/policy-agent/internal/policy"
-	"github.com/policy-agent/policy-agent/internal/validator"
-	"github.com/policy-agent/policy-agent/internal/validator/kafka"
-	"github.com/policy-agent/policy-agent/pkg/types"
+	"policy-agent/internal/agent"
+	"policy-agent/internal/ai"
+	"policy-agent/internal/config"
+	"policy-agent/internal/policy"
+	"policy-agent/internal/validator"
+	"policy-agent/internal/validator/kafka"
+	"policy-agent/pkg/types"
 	"github.com/spf13/cobra"
 )
 
