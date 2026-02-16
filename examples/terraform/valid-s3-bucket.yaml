@@ -1,0 +1,42 @@
+kind: TerraformConfig
+metadata:
+  name: prod-data-bucket
+  description: Production S3 bucket with proper security
+
+terraform:
+  required_version: ">= 1.5.0"
+  required_providers:
+    aws:
+      source: "hashicorp/aws"
+      version: "~> 5.0"
+  backend:
+    s3:
+      bucket: "myorg-terraform-state"
+      key: "s3-buckets/prod-data.tfstate"
+      region: "us-east-1"
+      encrypt: true
+      dynamodb_table: "terraform-state-lock"
+
+resource:
+  aws_s3_bucket:
+    prod_data:
+      bucket: "myorg-prod-data-bucket"
+      acl: "private"
+
+      tags:
+        Environment: "prod"
+        Owner: "data-team"
+        Project: "analytics"
+        ManagedBy: "terraform"
+
+      versioning:
+        enabled: true
+
+      server_side_encryption_configuration:
+        rule:
+          apply_server_side_encryption_by_default:
+            sse_algorithm: "AES256"
+
+      logging:
+        target_bucket: "myorg-logs-bucket"
+        target_prefix: "s3-access-logs/"

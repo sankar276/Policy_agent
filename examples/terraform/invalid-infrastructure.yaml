@@ -1,0 +1,56 @@
+kind: TerraformConfig
+metadata:
+  name: dev-infrastructure
+  description: Development infrastructure (has policy violations)
+
+# Missing terraform version!
+terraform:
+  required_providers:
+    aws:
+      source: "hashicorp/aws"
+      # Missing version constraint!
+  # Using local backend - should use remote!
+  backend:
+    local:
+      path: "terraform.tfstate"
+
+resource:
+  # S3 Bucket with security issues
+  aws_s3_bucket:
+    dev_bucket:
+      bucket: "dev-data"
+      acl: "public-read"  # PUBLIC BUCKET! ❌
+      # Missing tags! ❌
+      # No encryption! ❌
+      # No versioning!
+
+  # RDS with security issues
+  aws_rds_instance:
+    dev_db:
+      identifier: "dev-database"
+      engine: "postgres"
+      instance_class: "db.t3.micro"
+      publicly_accessible: true  # PUBLICLY ACCESSIBLE! ❌
+      storage_encrypted: false  # NO ENCRYPTION! ❌
+      backup_retention_period: 0  # NO BACKUPS! ❌
+      # Missing tags! ❌
+
+  # Security Group too permissive
+  aws_security_group:
+    dev_sg:
+      name: "dev-security-group"
+      description: "Development security group"
+
+      ingress:
+        - description: "SSH from anywhere"
+          from_port: 22
+          to_port: 22
+          protocol: "tcp"
+          cidr_blocks: ["0.0.0.0/0"]  # WIDE OPEN SSH! ❌
+
+        - description: "Database from anywhere"
+          from_port: 5432
+          to_port: 5432
+          protocol: "tcp"
+          cidr_blocks: ["0.0.0.0/0"]  # WIDE OPEN DATABASE! ❌
+      # Missing tags! ❌
