@@ -1,0 +1,41 @@
+Policy AI Agent
+Copyright (c) 2025 Policy AI Agent Contributors
+
+This software includes components from the following open source projects:
+
+## Go Implementation Dependencies
+
+- Open Policy Agent (OPA) - Apache 2.0 License
+  https://github.com/open-policy-agent/opa
+
+- Anthropic Go SDK - MIT License
+  https://github.com/anthropics/anthropic-sdk-go
+
+- Cobra (CLI framework) - Apache 2.0 License
+  https://github.com/spf13/cobra
+
+- Viper (Configuration) - MIT License
+  https://github.com/spf13/viper
+
+## Python Implementation Dependencies
+
+- Anthropic Python SDK - MIT License
+  https://github.com/anthropics/anthropic-sdk-python
+
+- Click (CLI framework) - BSD 3-Clause License
+  https://github.com/pallets/click
+
+- PyYAML - MIT License
+  https://github.com/yaml/pyyaml
+
+## Additional Acknowledgments
+
+This project uses Claude AI by Anthropic for intelligent configuration
+generation and policy remediation.
+
+The policy validation is powered by Open Policy Agent (OPA) using the
+Rego policy language.
+
+---
+
+For the complete license text, see the LICENSE file in this repository.
