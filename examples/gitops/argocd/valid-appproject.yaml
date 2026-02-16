@@ -1,0 +1,93 @@
+# Valid ArgoCD AppProject
+# This configuration provides proper multi-tenancy and security
+
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: webapp-prod
+  namespace: argocd
+spec:
+  # Description
+  description: Production project for webapp team
+
+  # Explicit source repositories (no wildcards)
+  sourceRepos:
+    - https://github.com/myorg/webapp.git
+    - https://github.com/myorg/webapp-config.git
+
+  # Explicit destinations
+  destinations:
+    # Production namespace only
+    - namespace: webapp-prod
+      server: https://kubernetes.default.svc
+    - namespace: webapp-prod-canary
+      server: https://kubernetes.default.svc
+
+  # Cluster resource whitelist (specific resources)
+  clusterResourceWhitelist:
+    - group: ""
+      kind: Namespace
+    - group: rbac.authorization.k8s.io
+      kind: ClusterRole
+    - group: rbac.authorization.k8s.io
+      kind: ClusterRoleBinding
+
+  # Namespace resource whitelist
+  namespaceResourceWhitelist:
+    - group: ""
+      kind: Service
+    - group: ""
+      kind: ConfigMap
+    - group: apps
+      kind: Deployment
+    - group: apps
+      kind: StatefulSet
+    - group: batch
+      kind: Job
+    - group: batch
+      kind: CronJob
+
+  # Namespace resource blacklist (sensitive resources)
+  namespaceResourceBlacklist:
+    - group: ""
+      kind: Secret
+
+  # RBAC roles
+  roles:
+    - name: developer
+      description: Developers with read-only access
+      policies:
+        - p, proj:webapp-prod:developer, applications, get, webapp-prod/*, allow
+        - p, proj:webapp-prod:developer, applications, sync, webapp-prod/*, allow
+      groups:
+        - webapp-developers
+
+    - name: admin
+      description: Administrators with full access
+      policies:
+        - p, proj:webapp-prod:admin, applications, *, webapp-prod/*, allow
+      groups:
+        - webapp-admins
+
+  # Orphaned resources detection
+  orphanedResources:
+    warn: true
+
+  # Sync windows for change control
+  syncWindows:
+    - kind: allow
+      schedule: '0 8-18 * * 1-5'  # Weekdays 8am-6pm
+      duration: 10h
+      applications:
+        - '*'
+      manualSync: true
+
+    - kind: deny
+      schedule: '0 0-8,18-23 * * *'  # Outside business hours
+      duration: 10h
+      applications:
+        - '*-prod'
+
+  # Signature keys for commit verification
+  signatureKeys:
+    - keyID: ABCD1234EFGH5678

@@ -1,0 +1,49 @@
+# Invalid GitLab CI Pipeline
+# This pipeline violates multiple security policies
+
+stages:
+  - build
+  - deploy
+
+# VIOLATION: No test stage defined
+
+# VIOLATION: Using :latest Docker tag
+build:
+  stage: build
+  image: node:latest
+  script:
+    - npm install
+    - npm run build
+  # VIOLATION: No artifact expiration set
+  artifacts:
+    paths:
+      - dist/
+
+# VIOLATION: Using privileged Docker mode
+build:docker:
+  stage: build
+  image: docker:cli
+  services:
+    - name: docker:dind
+      command: ["--privileged"]  # VIOLATION: Privileged mode
+  script:
+    - docker build -t myapp .
+
+# VIOLATION: Production deployment without manual approval
+deploy:prod:
+  stage: deploy
+  image: kubectl:latest
+  script:
+    - kubectl apply -f k8s/
+  # VIOLATION: Automatic deployment to production
+  environment: production
+  when: on_success
+
+# VIOLATION: Using latest tag in production
+deploy:container:
+  stage: deploy
+  image: google/cloud-sdk:latest
+  script:
+    - gcloud run deploy myapp --image gcr.io/myproject/myapp:latest
+  environment: production
+  # VIOLATION: Missing when: manual for production

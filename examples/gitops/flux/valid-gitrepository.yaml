@@ -1,0 +1,37 @@
+# Valid Flux GitRepository
+# This configuration follows all security best practices
+
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: webapp-repo
+  namespace: flux-system
+spec:
+  # HTTPS URL (secure)
+  url: https://github.com/myorg/webapp.git
+
+  # Reconciliation interval (3 minutes)
+  interval: 3m
+
+  # Explicit branch reference
+  ref:
+    branch: main
+
+  # Secret for authentication
+  secretRef:
+    name: git-credentials
+
+  # GPG verification for production
+  verify:
+    mode: head
+    secretRef:
+      name: gpg-public-keys
+
+  # Timeout for Git operations
+  timeout: 60s
+
+  # Ignore patterns
+  ignore: |
+    # Ignore temporary files
+    *.tmp
+    .DS_Store

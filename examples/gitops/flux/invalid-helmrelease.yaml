@@ -1,0 +1,52 @@
+# Invalid Flux HelmRelease
+# This configuration violates multiple Helm policies
+
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: nginx-ingress-prod
+  namespace: production
+spec:
+  # VIOLATION: No interval specified
+
+  # VIOLATION: Missing chart reference
+  # chart should be specified
+
+  # VIOLATION: No timeout (can hang indefinitely)
+
+  # Install configuration
+  install:
+    remediation:
+      # VIOLATION: Too many retries
+      retries: 15
+    # VIOLATION: Skipping CRDs (won't install required CRDs)
+    crds: Skip
+
+  # Upgrade configuration
+  upgrade:
+    # VIOLATION: Force enabled (can cause unexpected replacements)
+    force: true
+
+  # VIOLATION: Rollback disabled for production
+  rollback:
+    enable: false
+
+  # VIOLATION: No test configured for production
+
+  # VIOLATION: No service account specified
+
+  # Chart with version range
+  chart:
+    spec:
+      chart: myapp
+      # VIOLATION: Using version range instead of pinned version
+      version: "^1.x"
+      sourceRef:
+        kind: HelmRepository
+        name: myrepo
+
+  # VIOLATION: Resource is suspended (won't reconcile)
+  suspend: true
+
+  # Target production namespace
+  targetNamespace: production

@@ -1,0 +1,54 @@
+# Invalid ArgoCD Application
+# This configuration violates multiple GitOps policies
+
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: webapp-prod
+  namespace: argocd
+  # VIOLATION: No finalizers (can be accidentally deleted)
+spec:
+  # VIOLATION: Using default project (no isolation)
+  project: default
+
+  # Source configuration
+  source:
+    # VIOLATION: Using insecure HTTP
+    repoURL: http://github.com/myorg/webapp.git
+    # VIOLATION: Using HEAD (unpredictable)
+    targetRevision: HEAD
+    path: k8s/base
+
+  # Destination
+  destination:
+    server: https://kubernetes.default.svc
+    # VIOLATION: No namespace specified
+    # namespace should be defined
+
+  # Sync policy
+  syncPolicy:
+    # VIOLATION: Auto-sync for production (risky)
+    automated:
+      # VIOLATION: Prune not enabled (resources won't be cleaned up)
+      prune: false
+      selfHeal: true
+
+    # VIOLATION: Using Replace=true (can cause data loss)
+    syncOptions:
+      - Replace=true
+
+    # Retry configuration
+    retry:
+      # VIOLATION: Too many retries (11 exceeds maximum of 10)
+      limit: 11
+
+  # VIOLATION: Ignoring all fields (too broad)
+  ignoreDifferences:
+    - group: apps
+      kind: Deployment
+      jsonPointers:
+        - /
+
+  # Targeting production
+  destination:
+    namespace: production

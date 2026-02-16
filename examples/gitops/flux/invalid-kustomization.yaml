@@ -1,0 +1,32 @@
+# Invalid Flux Kustomization
+# This configuration violates multiple GitOps policies
+
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: webapp-prod
+  namespace: flux-system
+spec:
+  # VIOLATION: Interval too long (20 minutes)
+  interval: 20m
+
+  # VIOLATION: Missing sourceRef
+  # sourceRef should be defined
+
+  # VIOLATION: Path traversal vulnerability
+  path: ../../etc/secrets
+
+  # VIOLATION: Prune not enabled (deleted resources won't be cleaned up)
+  prune: false
+
+  # VIOLATION: Force enabled (can cause unexpected replacements)
+  force: true
+
+  # VIOLATION: No timeout set
+
+  # VIOLATION: No service account specified (uses default)
+
+  # VIOLATION: No health checks for production
+
+  # Targeting production namespace
+  targetNamespace: production

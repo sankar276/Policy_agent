@@ -1,0 +1,52 @@
+# Invalid GitHub Actions Workflow
+# This workflow violates multiple security policies
+
+# VIOLATION: Missing workflow name
+on:
+  push:
+    branches: [main]
+
+jobs:
+  # VIOLATION: No test job defined
+  build:
+    runs-on: ubuntu-latest
+    # VIOLATION: No timeout set
+
+    # VIOLATION: Write permissions granted
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v3
+
+      # VIOLATION: Third-party action not pinned to commit SHA
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      # VIOLATION: Using unpinned third-party action
+      - name: Run custom action
+        uses: some-org/custom-action@main
+
+      # VIOLATION: Potential secret exposure
+      - name: Debug secrets
+        run: |
+          echo "API Key: ${{ secrets.API_KEY }}"
+          echo "Token: ${{ secrets.GITHUB_TOKEN }}"
+
+      # VIOLATION: Using latest Docker tag
+      - name: Build with latest
+        run: docker build -t myapp:latest .
+
+  # VIOLATION: No security scanning configured
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    # VIOLATION: Timeout exceeds maximum
+    timeout-minutes: 120
+
+    steps:
+      - name: Deploy to production
+        run: ./deploy.sh

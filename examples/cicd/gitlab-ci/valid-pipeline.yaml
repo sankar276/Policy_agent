@@ -1,0 +1,92 @@
+# Valid GitLab CI Pipeline
+# This pipeline follows all security best practices
+
+stages:
+  - test
+  - security
+  - build
+  - deploy
+
+variables:
+  DOCKER_REGISTRY: "registry.gitlab.com"
+  IMAGE_TAG: $CI_COMMIT_SHORT_SHA
+
+# Test stage
+test:unit:
+  stage: test
+  image: node:20-alpine
+  script:
+    - npm ci
+    - npm test
+  coverage: '/Lines\s*:\s*(\d+\.\d+)%/'
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage/cobertura-coverage.xml
+    expire_in: 1 week
+
+test:integration:
+  stage: test
+  image: node:20-alpine
+  script:
+    - npm ci
+    - npm run test:integration
+  artifacts:
+    expire_in: 3 days
+
+# Security scanning
+security:sast:
+  stage: security
+  image: returntocorp/semgrep:latest
+  script:
+    - semgrep scan --config=auto .
+  allow_failure: false
+
+security:dependency-scan:
+  stage: security
+  image: aquasec/trivy:latest
+  script:
+    - trivy fs --security-checks vuln .
+  artifacts:
+    reports:
+      dependency_scanning: trivy-report.json
+    expire_in: 1 week
+
+# Build stage
+build:docker:
+  stage: build
+  image: docker:24-cli
+  services:
+    - docker:24-dind
+  script:
+    - docker build -t $DOCKER_REGISTRY/myapp:$IMAGE_TAG .
+    - docker push $DOCKER_REGISTRY/myapp:$IMAGE_TAG
+  only:
+    - main
+    - develop
+
+# Deploy to staging (automatic)
+deploy:staging:
+  stage: deploy
+  image: bitnami/kubectl:latest
+  script:
+    - kubectl set image deployment/myapp myapp=$DOCKER_REGISTRY/myapp:$IMAGE_TAG
+  environment:
+    name: staging
+    url: https://staging.example.com
+  only:
+    - develop
+
+# Deploy to production (manual approval required)
+deploy:production:
+  stage: deploy
+  image: bitnami/kubectl:latest
+  script:
+    - kubectl set image deployment/myapp myapp=$DOCKER_REGISTRY/myapp:$IMAGE_TAG
+  environment:
+    name: production
+    url: https://example.com
+  when: manual
+  only:
+    - main

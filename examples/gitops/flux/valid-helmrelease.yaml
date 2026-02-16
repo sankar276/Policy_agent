@@ -1,0 +1,74 @@
+# Valid Flux HelmRelease
+# This configuration follows all Helm best practices
+
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: nginx-ingress
+  namespace: infrastructure
+spec:
+  # Reconciliation interval
+  interval: 5m
+
+  # Chart reference
+  chart:
+    spec:
+      chart: ingress-nginx
+      # Pinned to specific version (not a range)
+      version: 4.8.3
+      sourceRef:
+        kind: HelmRepository
+        name: ingress-nginx
+        namespace: flux-system
+
+  # Timeout for operations
+  timeout: 5m
+
+  # Install configuration
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+    # CRDs policy
+    crds: CreateReplace
+
+  # Upgrade configuration
+  upgrade:
+    # Don't use force (safer)
+    force: false
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+      remediateLastFailure: true
+
+  # Automatic rollback on failure
+  rollback:
+    enable: true
+    recreate: true
+    cleanupOnFail: true
+
+  # Test after installation
+  test:
+    enable: true
+
+  # Service account for RBAC
+  serviceAccountName: helm-controller
+
+  # Values
+  values:
+    controller:
+      replicaCount: 3
+      service:
+        type: LoadBalancer
+      resources:
+        requests:
+          cpu: 100m
+          memory: 128Mi
+        limits:
+          cpu: 500m
+          memory: 512Mi
+
+  # Dependency ordering
+  dependsOn:
+    - name: cert-manager
+      namespace: cert-manager

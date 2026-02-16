@@ -1,0 +1,22 @@
+# Invalid Flux GitRepository
+# This configuration violates multiple security policies
+
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: webapp-repo-prod
+  namespace: flux-system
+spec:
+  # VIOLATION: Using insecure HTTP protocol
+  url: http://github.com/myorg/webapp.git
+
+  # VIOLATION: Interval too short (30 seconds)
+  interval: 30s
+
+  # VIOLATION: No explicit ref (uses default branch unpredictably)
+  # ref should be specified
+
+  # VIOLATION: No GPG verification for production
+  # verify should be configured for production repos
+
+  # VIOLATION: No timeout set

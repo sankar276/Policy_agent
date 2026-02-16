@@ -1,0 +1,54 @@
+# Valid Flux Kustomization
+# This configuration follows all GitOps best practices
+
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: webapp-prod
+  namespace: flux-system
+spec:
+  # Interval for reconciliation (5 minutes)
+  interval: 5m
+
+  # Source reference
+  sourceRef:
+    kind: GitRepository
+    name: webapp-repo
+
+  # Path within the repository
+  path: ./deploy/production
+
+  # Enable prune to clean up deleted resources
+  prune: true
+
+  # Wait for resources to be ready
+  wait: true
+
+  # Timeout for operations
+  timeout: 10m
+
+  # Service account for RBAC
+  serviceAccountName: flux-kustomization-controller
+
+  # Health checks for critical resources
+  healthChecks:
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: webapp
+      namespace: production
+    - apiVersion: v1
+      kind: Service
+      name: webapp
+      namespace: production
+
+  # Post-build variable substitution
+  postBuild:
+    substitute:
+      CLUSTER_NAME: "prod-us-west-2"
+      ENVIRONMENT: "production"
+
+  # Validation mode
+  validation: client
+
+  # Retry configuration
+  retryInterval: 2m

@@ -1,0 +1,51 @@
+# Invalid ArgoCD AppProject
+# This configuration violates multiple security policies
+
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  # VIOLATION: Using 'default' project name for production
+  name: default
+  namespace: argocd-prod
+spec:
+  description: Default project
+
+  # VIOLATION: Wildcard allows all repositories
+  sourceRepos:
+    - '*'
+
+  # VIOLATION: Empty destinations list
+  destinations: []
+
+  # Alternative violation: Wildcard namespace
+  # destinations:
+  #   - namespace: '*'
+  #     server: https://external-cluster.example.com
+
+  # VIOLATION: Wildcard allows all cluster resources
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
+
+  # VIOLATION: No namespace resource whitelist defined
+
+  # VIOLATION: No namespace resource blacklist (secrets not protected)
+
+  # VIOLATION: No RBAC roles defined for production
+
+  # VIOLATION: No orphaned resources detection
+  # orphanedResources should be configured
+
+  # VIOLATION: No sync windows for production change control
+  # syncWindows should be configured
+
+  # VIOLATION: No signature keys for commit verification
+  # signatureKeys should be configured
+
+  # VIOLATION: Role with wildcard permissions
+  roles:
+    - name: super-user
+      policies:
+        - p, proj:default:super-user, *, *, */*, allow
+      groups:
+        - everyone

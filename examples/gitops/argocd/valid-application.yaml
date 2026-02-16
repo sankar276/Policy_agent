@@ -1,0 +1,66 @@
+# Valid ArgoCD Application
+# This configuration follows all GitOps best practices
+
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: webapp-staging
+  namespace: argocd
+  # Finalizers to prevent accidental deletion
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  # Dedicated project (not default)
+  project: webapp-project
+
+  # Source configuration
+  source:
+    # HTTPS URL (secure)
+    repoURL: https://github.com/myorg/webapp.git
+    # Pinned to specific branch
+    targetRevision: release/v1.2.0
+    path: k8s/overlays/staging
+
+    # Kustomize configuration
+    kustomize:
+      images:
+        - myapp=registry.example.com/myapp:v1.2.0
+
+  # Destination
+  destination:
+    # Specific cluster
+    server: https://kubernetes.default.svc
+    # Explicit namespace
+    namespace: webapp-staging
+
+  # Sync policy
+  syncPolicy:
+    # Manual sync for staging (safer)
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: false
+
+    # Sync options
+    syncOptions:
+      - CreateNamespace=true
+      - PrunePropagationPolicy=foreground
+      - PruneLast=true
+
+    # Retry configuration
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
+
+  # Ignore differences for generated fields
+  ignoreDifferences:
+    - group: apps
+      kind: Deployment
+      jsonPointers:
+        - /spec/replicas
+
+  # Health assessment
+  revisionHistoryLimit: 10
