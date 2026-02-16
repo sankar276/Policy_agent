@@ -1,4 +1,4 @@
-# Unified Policy AI Agent
+#  Policy AI Agent
 
 [![Go Version](https://img.shields.io/badge/Go-1.22+-00ADD8?style=flat&logo=go)](https://go.dev)
 [![Python Version](https://img.shields.io/badge/Python-3.9+-3776AB?style=flat&logo=python)](https://python.org)
