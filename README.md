@@ -27,7 +27,7 @@ Validate, generate, and fix configurations across multiple infrastructure domain
 
 ## 🎯 Overview
 
-The Unified Policy AI Agent helps platform teams ensure compliance, security, and best practices across their entire technology stack. It combines:
+The Policy AI Agent helps platform teams ensure compliance, security, and best practices across their entire technology stack. It combines:
 
 - **OPA/Rego** for policy-as-code validation
 - **Claude AI** for intelligent config generation and remediation
@@ -72,11 +72,11 @@ The Unified Policy AI Agent helps platform teams ensure compliance, security, an
 
 | Domain | Status | Policies | Description |
 |--------|--------|----------|-------------|
-| **Kafka (CFK)** | ✅ Complete | 3 policies | Topics, connectors, schema registry |
-| **Kubernetes** | 📋 Planned | - | Manifests, deployments, services |
-| **IaC** | 📋 Planned | - | Terraform, CloudFormation, Pulumi |
-| **CI/CD** | 📋 Planned | - | GitHub Actions, GitLab CI, Jenkins |
-| **AppConfig** | 📋 Planned | - | Application configurations |
+| **Kafka (CFK)** | ✅ Complete | 15+ policies | Topics, connectors, schema registry |
+| **Kubernetes** | ✅ Complete | 10+ policies | Deployments, pods, services, config maps |
+| **IaC (Terraform)** | ✅ Complete | 12+ policies | Provider versioning, state encryption, security |
+| **CI/CD** | ✅ Complete | 8+ policies | GitHub Actions, GitLab CI workflows |
+| **GitOps** | ✅ Complete | 10+ policies | Flux CD, ArgoCD applications |
 
 ### Kafka Policies (Example)
 
