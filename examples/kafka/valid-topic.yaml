@@ -1,0 +1,31 @@
+# Example Kafka Topic that Passes All Policy Checks
+# This topic is compliant with all policies
+
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: user-events-topic
+  labels:
+    app: user-service
+    environment: production
+    owner: platform-team
+spec:
+  # ✓ Replication factor meets minimum requirement of 3
+  replicas: 3
+
+  partitions: 12
+
+  config:
+    # ✓ Compression is enabled with lz4 (recommended)
+    compression.type: "lz4"
+
+    # ✓ Retention is set to 30 days (within limits)
+    retention.ms: "2592000000"  # 30 days
+
+    # ✓ min.insync.replicas is set to 2 (ensures write durability)
+    min.insync.replicas: "2"
+
+    # Additional best-practice configurations
+    segment.ms: "604800000"  # 7 days
+    cleanup.policy: "delete"
+    max.message.bytes: "1048576"  # 1MB

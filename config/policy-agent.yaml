@@ -1,0 +1,144 @@
+version: "1.0"
+
+# Agent configuration
+agent:
+  name: "policy-ai-agent"
+  log_level: "info"
+
+# Policy engine configuration
+policy:
+  engine: "opa"
+  policy_path: "./policies"
+
+  # Which domains to enable
+  enabled_domains:
+    - kafka
+    - kubernetes
+    - iac
+    - cicd
+    - appconfig
+
+  # Enforcement mode: strict, warn, or permissive
+  # - strict: Block on any violation
+  # - warn: Report violations but don't block
+  # - permissive: Report violations as warnings
+  enforcement_mode: "strict"
+
+# AI configuration
+ai:
+  provider: "anthropic"
+  api_key_env: "ANTHROPIC_API_KEY"
+  model: "claude-sonnet-4-5-20250929"
+
+  # AI features
+  features:
+    auto_remediation: true
+    generation: true
+    explanation: true
+
+  # Rate limiting
+  rate_limiting:
+    requests_per_minute: 50
+    burst: 10
+
+  # Caching
+  cache:
+    enabled: true
+    ttl: "1h"
+
+# Domain-specific policy configurations
+domains:
+  kafka:
+    # Replication policies
+    min_replication_factor: 3
+    require_min_insync_replicas: true
+    min_insync_replicas_value: 2
+
+    # Compression policies
+    require_compression: true
+    allowed_compression_types:
+      - "lz4"
+      - "snappy"
+      - "zstd"
+    recommended_compression: "lz4"
+
+    # Retention policies
+    max_retention_days: 90
+    warn_retention_days: 60
+    min_retention_days: 1
+
+  kubernetes:
+    required_labels:
+      - "app"
+      - "environment"
+      - "owner"
+    enforce_resource_limits: true
+    disallow_privileged: true
+    disallow_host_network: true
+
+  iac:
+    terraform:
+      required_providers_version: true
+      state_encryption: true
+      require_backend_config: true
+
+  cicd:
+    github_actions:
+      disallow_secrets_in_logs: true
+      require_permissions_block: true
+
+  appconfig:
+    disallow_plain_secrets: true
+    require_env_validation: true
+
+# Integration settings
+integrations:
+  # Git hooks
+  git_hooks:
+    enabled: true
+    hooks:
+      - "pre-commit"
+      - "pre-push"
+    fail_on_violation: true
+    fail_on_warning: false
+
+  # CI/CD integrations
+  cicd:
+    github_actions:
+      enabled: true
+      fail_on_violation: true
+    gitlab_ci:
+      enabled: true
+      fail_on_violation: true
+
+  # Kubernetes webhook
+  webhook:
+    enabled: false
+    port: 8443
+    tls:
+      cert_path: "/etc/certs/tls.crt"
+      key_path: "/etc/certs/tls.key"
+    timeout_seconds: 10
+
+# Storage configuration
+storage:
+  backend: "filesystem"  # filesystem, s3, git
+  path: "/var/policy-agent"
+
+  audit_log:
+    enabled: true
+    retention_days: 90
+
+# Telemetry configuration
+telemetry:
+  enabled: true
+  export: "prometheus"  # prometheus, otlp, none
+  metrics:
+    enabled: true
+    port: 9090
+  logging:
+    format: "json"  # json, text
+    output: "stdout"  # stdout, file
+  tracing:
+    enabled: false
+    endpoint: ""

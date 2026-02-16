@@ -1,0 +1,26 @@
+# Example Kafka Topic with Policy Violations
+# This topic will fail validation due to multiple policy violations
+
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: test-topic
+  labels:
+    app: test-app
+spec:
+  # VIOLATION: Replication factor is 1 (minimum required is 3)
+  replicas: 1
+
+  partitions: 3
+
+  config:
+    # VIOLATION: No compression configured (compression is required)
+    # compression.type: lz4  # This should be uncommented
+
+    # VIOLATION: Retention is too high (90+ days exceeds maximum)
+    retention.ms: "7776000000"  # 90 days
+
+    # VIOLATION: min.insync.replicas is missing (required for data durability)
+    # min.insync.replicas: "2"  # This should be uncommented
+
+    segment.ms: "604800000"  # 7 days

@@ -1,0 +1,27 @@
+# Example Kafka Topic with Warnings
+# This topic passes validation but has warnings
+
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: legacy-topic
+  labels:
+    app: legacy-app
+spec:
+  # ✓ Meets minimum replication factor
+  replicas: 3
+
+  partitions: 6
+
+  config:
+    # ✓ Compression enabled (but using gzip which has higher CPU overhead)
+    # WARNING: Consider using lz4 or zstd instead
+    compression.type: "gzip"
+
+    # WARNING: High retention (65 days triggers warning at 60+ days)
+    retention.ms: "5616000000"  # 65 days
+
+    # ✓ min.insync.replicas configured correctly
+    min.insync.replicas: "2"
+
+    segment.ms: "604800000"
