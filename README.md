@@ -2,7 +2,7 @@
 
 [![Go Version](https://img.shields.io/badge/Go-1.22+-00ADD8?style=flat&logo=go)](https://go.dev)
 [![Python Version](https://img.shields.io/badge/Python-3.9+-3776AB?style=flat&logo=python)](https://python.org)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
 > AI-powered policy validation, generation, and enforcement for DevOps/GitOps workflows
 
@@ -879,7 +879,7 @@ Open a PR on GitHub with:
 
 ## 📄 License
 
-MIT License - see [LICENSE](LICENSE) file for details.
+Apache License 2.0 - see [LICENSE](LICENSE) file for details.
 
 ---
 
