@@ -102,8 +102,9 @@ The Policy AI Agent helps platform teams ensure compliance, security, and best p
 ### 5-Minute Quick Start
 
 ```bash
-# Clone/navigate to project
-cd /Users/ramasankarmolleti/Desktop/MyWebsite
+# Clone the repository (or navigate to your project directory)
+git clone https://github.com/your-org/policy-agent.git
+cd policy-agent
 
 # Option 1: Go (Recommended for CLI tools)
 cd policy-agent
